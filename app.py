@@ -224,9 +224,11 @@ with st.sidebar:
             )
             st.toast("Saved.")
 
-    if st.button("Reset conversation", type="primary"):
-        st.session_state.pop("turns", None)
-        st.rerun()
+        if st.button("Reset conversation", type="primary"):
+            st.session_state.pop("turns", None)
+            st.session_state.chat_id = uuid.uuid4().hex
+            st.session_state.chat_title = "Untitled"
+            st.rerun()
 
     saved = _list_saved_chats()
     if saved:
@@ -301,7 +303,7 @@ if prompt:
     with st.chat_message("assistant"):
         with st.spinner("Thinking…"):
             result = agent.invoke(
-            {"messages": _turns_to_langchain_messages(turns)},
+            {"messages": [HumanMessage(content=prompt)]},
             config={"configurable": {"thread_id": st.session_state.chat_id}},
             )
             answer = _extract_last_assistant_text(result)
